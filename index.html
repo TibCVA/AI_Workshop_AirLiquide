@@ -51,6 +51,9 @@
             background: var(--white);
             overflow-y: auto;
             animation: slideIn 0.4s ease-out;
+            position: absolute;
+            top: 70px;
+            left: 0;
         }
         
         @keyframes slideIn {
@@ -66,6 +69,7 @@
         
         .slide.active {
             display: block;
+            z-index: 10;
         }
         
         .navigation {
