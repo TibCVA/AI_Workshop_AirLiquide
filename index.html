@@ -4,6 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Apprendre les nombres avec plaisir !</title>
+    <!--
+    POUR UTILISER LES VRAIES IMAGES DES POKÉMON :
+    
+    1. Convertir chaque image en base64 sur https://www.base64-image.de/
+    2. Dans la fonction generateNumber(), remplacer cette ligne :
+       const svgPokemon = createPokemonSVG(currentNumber);
+       pokemonImage.src = 'data:image/svg+xml;base64,' + btoa(svgPokemon);
+       
+       Par :
+       pokemonImage.src = pokemonData[currentNumber].image;
+       
+    3. Mettre à jour pokemonData avec les vraies données base64 :
+       11: {
+           name: "Onzo",
+           image: "data:image/png;base64,[VOTRE_IMAGE_BASE64_ICI]"
+       },
+       
+    Les SVG actuels sont des représentations fidèles des Pokémon
+    avec les nombres anthropomorphisés en style cartoon doré.
+    -->
     <style>
         * {
             margin: 0;
@@ -101,11 +121,20 @@
         }
 
         .game-area {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+            display: flex;
+            flex-direction: column;
             gap: 40px;
             margin: 40px 0;
             align-items: center;
+            justify-content: center;
+        }
+
+        .display-section {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
         }
 
         .number-section {
@@ -117,6 +146,100 @@
             box-shadow: 
                 0 15px 35px rgba(0, 0, 0, 0.3),
                 inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+        }
+
+        .pokemon-section {
+            background: linear-gradient(145deg, #ffd93d, #ff6b6b, #4ecdc4);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 
+                0 15px 35px rgba(0, 0, 0, 0.3),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.2);
+            animation: slideIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pokemon-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.3) 50%, transparent 70%);
+            animation: shine 3s ease-in-out infinite;
+            transform: rotate(30deg);
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(30deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(30deg); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(50px) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+
+        .pokemon-container {
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .pokemon-container img {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+            animation: float 3s ease-in-out infinite;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .pokemon-container img:hover {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .pokemon-container img:active {
+            transform: scale(0.95);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes speak {
+            0%, 100% { transform: scale(1) translateY(0); }
+            25% { transform: scale(1.1) translateY(-5px); }
+            75% { transform: scale(0.9) translateY(5px); }
+        }
+
+        @keyframes jump {
+            0% { transform: translateY(0) scale(1); }
+            30% { transform: translateY(-30px) scale(1.1); }
+            50% { transform: translateY(-40px) scale(1.1); }
+            70% { transform: translateY(-30px) scale(1.1); }
+            100% { transform: translateY(0) scale(1); }
+        }
+
+        .pokemon-name {
+            color: white;
+            font-size: 2em;
+            font-weight: 800;
+            margin-top: 15px;
+            text-shadow: 
+                2px 2px 4px rgba(0, 0, 0, 0.3),
+                0 0 20px rgba(255, 255, 255, 0.5);
+            letter-spacing: 1px;
         }
 
         .number-section::before {
@@ -268,6 +391,10 @@
             line-height: 1.8;
             font-weight: 300;
             letter-spacing: 0.5px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
         }
 
         .instruction-item {
@@ -317,9 +444,22 @@
                 gap: 60px;
             }
 
+            .display-section {
+                gap: 40px;
+            }
+
             .number-display {
                 font-size: 12em;
                 min-height: 300px;
+            }
+
+            .pokemon-container img {
+                width: 250px;
+                height: 250px;
+            }
+
+            .pokemon-name {
+                font-size: 2.5em;
             }
 
             .btn {
@@ -343,8 +483,18 @@
             }
 
             .game-area {
-                grid-template-columns: 1fr;
                 gap: 30px;
+            }
+
+            .display-section {
+                flex-direction: column;
+                gap: 20px;
+                width: 100%;
+            }
+
+            .number-section, .pokemon-section {
+                width: 100%;
+                max-width: 300px;
             }
 
             .number-display {
@@ -352,9 +502,24 @@
                 min-height: 150px;
             }
 
+            .pokemon-container img {
+                width: 150px;
+                height: 150px;
+            }
+
+            .pokemon-name {
+                font-size: 1.5em;
+            }
+
+            .controls-section {
+                width: 100%;
+            }
+
             .btn {
                 font-size: 1.4em;
                 padding: 25px 40px;
+                width: 100%;
+                max-width: 300px;
             }
 
             .instructions {
@@ -422,10 +587,19 @@
         </div>
 
         <div class="game-area">
-            <div class="number-section">
-                <div class="shine"></div>
-                <div class="number-display" id="numberDisplay">
-                    ?
+            <div class="display-section">
+                <div class="number-section">
+                    <div class="shine"></div>
+                    <div class="number-display" id="numberDisplay">
+                        ?
+                    </div>
+                </div>
+                
+                <div class="pokemon-section" id="pokemonSection" style="display: none;">
+                    <div class="pokemon-container">
+                        <img id="pokemonImage" src="" alt="" onclick="interactWithPokemon()">
+                        <div class="pokemon-name" id="pokemonName"></div>
+                    </div>
                 </div>
             </div>
 
@@ -448,6 +622,67 @@
         const numberDisplay = document.getElementById('numberDisplay');
         const listenBtn = document.getElementById('listenBtn');
         const particlesContainer = document.getElementById('particles');
+        const pokemonSection = document.getElementById('pokemonSection');
+        const pokemonImage = document.getElementById('pokemonImage');
+        const pokemonName = document.getElementById('pokemonName');
+
+        // Interaction avec le Pokémon
+        function interactWithPokemon() {
+            if (currentNumber >= 11 && currentNumber <= 16) {
+                const img = document.getElementById('pokemonImage');
+                
+                // Animation de saut
+                img.style.animation = 'jump 0.5s ease-out';
+                
+                // Dire le nom du Pokémon
+                const utterance = new SpeechSynthesisUtterance(`Je suis ${pokemonData[currentNumber].name}, le nombre ${currentNumber} !`);
+                utterance.lang = 'fr-FR';
+                utterance.rate = 0.9;
+                utterance.pitch = 1.3;
+                speechSynthesis.speak(utterance);
+                
+                // Créer des cœurs
+                createFloatingEmojis(['❤️', '💛', '💚', '💙'], 6);
+                
+                setTimeout(() => {
+                    img.style.animation = 'float 3s ease-in-out infinite';
+                }, 500);
+            }
+        }
+
+        // Images des Pokémon - Remplacer les placeholders par les vraies images en base64
+        const pokemonData = {
+            11: {
+                name: "Onzo",
+                image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", // Placeholder - Nombre 11 avec visage souriant
+                description: "Le Pokémon du nombre onze"
+            },
+            12: {
+                name: "Douzo", 
+                image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", // Placeholder - Nombre 12 avec un seul œil
+                description: "Le Pokémon du nombre douze"
+            },
+            13: {
+                name: "Treizo",
+                image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", // Placeholder - Nombre 13 avec pose cool
+                description: "Le Pokémon du nombre treize"
+            },
+            14: {
+                name: "Quatorzo",
+                image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", // Placeholder - Nombre 14 avec deux personnages
+                description: "Le Pokémon du nombre quatorze"
+            },
+            15: {
+                name: "Quinzo",
+                image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", // Placeholder - Nombre 15 avec queue enroulée
+                description: "Le Pokémon du nombre quinze"
+            },
+            16: {
+                name: "Seizo",
+                image: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==", // Placeholder - Nombre 16 joyeux
+                description: "Le Pokémon du nombre seize"
+            }
+        };
 
         // Créer des particules animées
         function createParticles() {
@@ -467,6 +702,239 @@
 
         createParticles();
 
+        // Fonction pour créer les SVG des Pokémon
+        function createPokemonSVG(number) {
+            // Style commun pour tous les Pokémon
+            const baseColor = '#f5c842';
+            const shadowColor = '#d4a574';
+            const strokeColor = '#2a2a2a';
+            
+            // SVG de base avec les éléments communs
+            let svg = `
+                <svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                    <!-- Ombre au sol -->
+                    <ellipse cx="100" cy="185" rx="60" ry="8" fill="#00000020" />
+                    
+                    <!-- Plateforme dorée -->
+                    <ellipse cx="100" cy="180" rx="55" ry="12" fill="${shadowColor}" />
+                    <ellipse cx="100" cy="175" rx="55" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+            `;
+
+            // Configurations spécifiques pour chaque Pokémon
+            switch(number) {
+                case 11: // Onzo
+                    svg += `
+                        <!-- Corps du 11 -->
+                        <g transform="translate(100, 90)">
+                            <!-- Bras -->
+                            <ellipse cx="-45" cy="20" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(-30 -45 20)"/>
+                            <ellipse cx="45" cy="20" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(30 45 20)"/>
+                            
+                            <!-- Jambes/Base -->
+                            <rect x="-50" y="60" width="100" height="25" rx="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            
+                            <!-- Chiffre 11 -->
+                            <rect x="-35" y="-40" width="25" height="80" rx="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            <rect x="10" y="-40" width="25" height="80" rx="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            
+                            <!-- Connexion -->
+                            <rect x="-35" y="20" width="70" height="20" fill="${baseColor}"/>
+                            
+                            <!-- Yeux -->
+                            <ellipse cx="-20" cy="-10" rx="10" ry="12" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <ellipse cx="20" cy="-10" rx="10" ry="12" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <circle cx="-20" cy="-8" r="5" fill="${strokeColor}"/>
+                            <circle cx="20" cy="-8" r="5" fill="${strokeColor}"/>
+                            <circle cx="-18" cy="-10" r="2" fill="white"/>
+                            <circle cx="22" cy="-10" r="2" fill="white"/>
+                            
+                            <!-- Bouche -->
+                            <path d="M-15,10 Q0,20 15,10" stroke="${strokeColor}" stroke-width="3" fill="none"/>
+                            <path d="M-10,10 Q0,15 10,10" fill="#d2616a" stroke="${strokeColor}" stroke-width="2"/>
+                        </g>
+                    `;
+                    break;
+                    
+                case 12: // Douzo
+                    svg += `
+                        <!-- Corps du 12 -->
+                        <g transform="translate(100, 90)">
+                            <!-- Bras -->
+                            <ellipse cx="-45" cy="20" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(-30 -45 20)"/>
+                            <ellipse cx="45" cy="20" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(30 45 20)"/>
+                            
+                            <!-- Base élargie -->
+                            <path d="M-50,60 Q-50,85 -25,85 L25,85 Q50,85 50,60 Z" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            
+                            <!-- Chiffre 12 -->
+                            <rect x="-35" y="-40" width="25" height="80" rx="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            <path d="M10,-40 Q35,-40 35,-20 L35,-10 Q35,0 25,0 L15,0 Q5,0 5,10 L5,20 Q5,30 15,30 L25,30 Q35,30 35,40" 
+                                  stroke="${strokeColor}" stroke-width="20" fill="none" stroke-linecap="round"/>
+                            <path d="M10,-40 Q35,-40 35,-20 L35,-10 Q35,0 25,0 L15,0 Q5,0 5,10 L5,20 Q5,30 15,30 L25,30 Q35,30 35,40" 
+                                  stroke="${baseColor}" stroke-width="14" fill="none" stroke-linecap="round"/>
+                            
+                            <!-- Oeil unique au centre -->
+                            <ellipse cx="0" cy="-10" rx="12" ry="15" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <circle cx="0" cy="-8" r="6" fill="${strokeColor}"/>
+                            <circle cx="2" cy="-10" r="2" fill="white"/>
+                            
+                            <!-- Grande bouche souriante -->
+                            <path d="M-20,5 Q0,20 20,5" stroke="${strokeColor}" stroke-width="3" fill="none"/>
+                            <path d="M-15,8 Q0,18 15,8 L15,12 Q0,22 -15,12 Z" fill="#d2616a" stroke="${strokeColor}" stroke-width="2"/>
+                        </g>
+                    `;
+                    break;
+                    
+                case 13: // Treizo
+                    svg += `
+                        <!-- Corps du 13 -->
+                        <g transform="translate(100, 90)">
+                            <!-- Bras avec poses différentes -->
+                            <ellipse cx="-45" cy="10" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(-45 -45 10)"/>
+                            <ellipse cx="45" cy="30" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(45 45 30)"/>
+                            
+                            <!-- Base -->
+                            <ellipse cx="0" cy="75" rx="45" ry="15" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            
+                            <!-- Chiffre 13 avec forme stylisée -->
+                            <rect x="-35" y="-40" width="25" height="80" rx="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            <path d="M10,-40 Q35,-40 35,-25 Q35,-10 20,-10 Q35,-10 35,5 Q35,20 20,20 Q35,20 35,35 Q35,50 10,50" 
+                                  stroke="${strokeColor}" stroke-width="20" fill="none" stroke-linecap="round"/>
+                            <path d="M10,-40 Q35,-40 35,-25 Q35,-10 20,-10 Q35,-10 35,5 Q35,20 20,20 Q35,20 35,35 Q35,50 10,50" 
+                                  stroke="${baseColor}" stroke-width="14" fill="none" stroke-linecap="round"/>
+                            
+                            <!-- Yeux malicieux -->
+                            <ellipse cx="-20" cy="-15" rx="8" ry="10" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <ellipse cx="20" cy="-5" rx="8" ry="10" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <path d="M-25,-20 L-15,-15" stroke="${strokeColor}" stroke-width="2"/>
+                            <path d="M15,-10 L25,-5" stroke="${strokeColor}" stroke-width="2"/>
+                            <circle cx="-20" cy="-13" r="4" fill="${strokeColor}"/>
+                            <circle cx="20" cy="-3" r="4" fill="${strokeColor}"/>
+                            
+                            <!-- Sourire espiègle -->
+                            <path d="M-15,10 Q-5,15 5,10 Q10,8 15,10" stroke="${strokeColor}" stroke-width="3" fill="none"/>
+                        </g>
+                    `;
+                    break;
+                    
+                case 14: // Quatorzo
+                    svg += `
+                        <!-- Corps du 14 -->
+                        <g transform="translate(100, 90)">
+                            <!-- Bras -->
+                            <ellipse cx="-45" cy="20" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(-30 -45 20)"/>
+                            <ellipse cx="45" cy="20" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(30 45 20)"/>
+                            
+                            <!-- Base -->
+                            <ellipse cx="0" cy="75" rx="45" ry="15" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            
+                            <!-- Chiffre 14 -->
+                            <rect x="-35" y="-40" width="25" height="80" rx="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            <path d="M35,10 L35,-40 L10,-40 L10,40 M5,10 L45,10" 
+                                  stroke="${strokeColor}" stroke-width="18" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            <path d="M35,10 L35,-40 L10,-40 L10,40 M5,10 L45,10" 
+                                  stroke="${baseColor}" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                            
+                            <!-- Yeux contents -->
+                            <ellipse cx="-20" cy="-10" rx="10" ry="12" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <ellipse cx="25" cy="-10" rx="10" ry="12" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <circle cx="-20" cy="-8" r="5" fill="${strokeColor}"/>
+                            <circle cx="25" cy="-8" r="5" fill="${strokeColor}"/>
+                            <circle cx="-18" cy="-10" r="2" fill="white"/>
+                            <circle cx="27" cy="-10" r="2" fill="white"/>
+                            
+                            <!-- Sourire content -->
+                            <path d="M-20,8 Q0,18 20,8" stroke="${strokeColor}" stroke-width="3" fill="none"/>
+                            <path d="M-15,10 Q0,18 15,10 L15,14 Q0,20 -15,14 Z" fill="#d2616a" stroke="${strokeColor}" stroke-width="2"/>
+                        </g>
+                    `;
+                    break;
+                    
+                case 15: // Quinzo
+                    svg += `
+                        <!-- Corps du 15 -->
+                        <g transform="translate(100, 90)">
+                            <!-- Bras avec mouvement -->
+                            <ellipse cx="-45" cy="15" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(-40 -45 15)"/>
+                            <ellipse cx="45" cy="25" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(20 45 25)"/>
+                            
+                            <!-- Queue enroulée -->
+                            <path d="M30,60 Q50,70 40,85 Q30,95 20,85" stroke="${strokeColor}" stroke-width="12" fill="none" stroke-linecap="round"/>
+                            <path d="M30,60 Q50,70 40,85 Q30,95 20,85" stroke="${baseColor}" stroke-width="6" fill="none" stroke-linecap="round"/>
+                            
+                            <!-- Base avec forme unique -->
+                            <ellipse cx="0" cy="75" rx="45" ry="15" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            
+                            <!-- Chiffre 15 -->
+                            <rect x="-35" y="-40" width="25" height="80" rx="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            <path d="M10,-40 L30,-40 Q40,-40 40,-30 Q40,-20 30,-20 L20,-20 Q10,-20 10,-10 Q10,0 20,0 L30,0 Q40,0 40,10 Q40,20 35,25 Q30,30 20,35 Q10,40 5,45" 
+                                  stroke="${strokeColor}" stroke-width="18" fill="none" stroke-linecap="round"/>
+                            <path d="M10,-40 L30,-40 Q40,-40 40,-30 Q40,-20 30,-20 L20,-20 Q10,-20 10,-10 Q10,0 20,0 L30,0 Q40,0 40,10 Q40,20 35,25 Q30,30 20,35 Q10,40 5,45" 
+                                  stroke="${baseColor}" stroke-width="12" fill="none" stroke-linecap="round"/>
+                            
+                            <!-- Oeil clin d'oeil -->
+                            <ellipse cx="-20" cy="-10" rx="10" ry="12" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <circle cx="-20" cy="-8" r="5" fill="${strokeColor}"/>
+                            <circle cx="-18" cy="-10" r="2" fill="white"/>
+                            <path d="M15,-15 Q25,-10 35,-15" stroke="${strokeColor}" stroke-width="3" fill="none"/>
+                            
+                            <!-- Langue tirée -->
+                            <path d="M-15,10 Q0,15 15,10" stroke="${strokeColor}" stroke-width="3" fill="none"/>
+                            <ellipse cx="5" cy="18" rx="8" ry="10" fill="#ff6b6b" stroke="${strokeColor}" stroke-width="2"/>
+                        </g>
+                    `;
+                    break;
+                    
+                case 16: // Seizo
+                    svg += `
+                        <!-- Corps du 16 -->
+                        <g transform="translate(100, 90)">
+                            <!-- Bras en l'air (victoire) -->
+                            <ellipse cx="-45" cy="0" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(-60 -45 0)"/>
+                            <ellipse cx="45" cy="0" rx="15" ry="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3" transform="rotate(60 45 0)"/>
+                            
+                            <!-- Base -->
+                            <ellipse cx="0" cy="75" rx="45" ry="15" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            
+                            <!-- Chiffre 16 -->
+                            <rect x="-35" y="-40" width="25" height="80" rx="12" fill="${baseColor}" stroke="${strokeColor}" stroke-width="3"/>
+                            <path d="M25,-40 Q10,-40 10,-25 Q10,-10 20,-10 L25,-10 Q35,-10 35,0 Q35,10 25,10 L20,10 Q10,10 10,20 Q10,30 20,30 L25,30 Q35,30 35,40 Q35,50 25,50 Q15,50 10,40 Q10,30 10,20 Q10,10 10,0 Q10,-10 10,-20 Q10,-30 10,-40" 
+                                  stroke="${strokeColor}" stroke-width="18" fill="none" stroke-linecap="round"/>
+                            <path d="M25,-40 Q10,-40 10,-25 Q10,-10 20,-10 L25,-10 Q35,-10 35,0 Q35,10 25,10 L20,10 Q10,10 10,20 Q10,30 20,30 L25,30 Q35,30 35,40 Q35,50 25,50 Q15,50 10,40 Q10,30 10,20 Q10,10 10,0 Q10,-10 10,-20 Q10,-30 10,-40" 
+                                  stroke="${baseColor}" stroke-width="12" fill="none" stroke-linecap="round"/>
+                            
+                            <!-- Yeux joyeux -->
+                            <ellipse cx="-20" cy="-10" rx="10" ry="12" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <ellipse cx="25" cy="-10" rx="10" ry="12" fill="white" stroke="${strokeColor}" stroke-width="2"/>
+                            <circle cx="-20" cy="-8" r="6" fill="${strokeColor}"/>
+                            <circle cx="25" cy="-8" r="6" fill="${strokeColor}"/>
+                            <circle cx="-18" cy="-10" r="2" fill="white"/>
+                            <circle cx="27" cy="-10" r="2" fill="white"/>
+                            
+                            <!-- Grand sourire -->
+                            <path d="M-25,5 Q0,25 25,5" stroke="${strokeColor}" stroke-width="3" fill="none"/>
+                            <path d="M-20,8 Q0,22 20,8 L20,15 Q0,25 -20,15 Z" fill="#d2616a" stroke="${strokeColor}" stroke-width="2"/>
+                            <rect x="-8" y="8" width="5" height="8" fill="white" rx="1"/>
+                            <rect x="-2" y="8" width="5" height="8" fill="white" rx="1"/>
+                            <rect x="4" y="8" width="5" height="8" fill="white" rx="1"/>
+                        </g>
+                    `;
+                    break;
+            }
+            
+            svg += `
+                    <!-- Reflets et finition -->
+                    <ellipse cx="70" cy="50" rx="12" ry="18" fill="white" opacity="0.3" transform="rotate(-20 70 50)"/>
+                    <ellipse cx="120" cy="60" rx="8" ry="12" fill="white" opacity="0.2" transform="rotate(20 120 60)"/>
+                    
+                    <!-- Signature du nombre -->
+                    <text x="100" y="195" text-anchor="middle" font-family="Arial" font-size="12" fill="${strokeColor}" opacity="0.5">${number}</text>
+                </svg>
+            `;
+            
+            return svg;
+        }
+
         function generateNumber() {
             // Vibration tactile sur iPad/iPhone
             if (navigator.vibrate) {
@@ -484,6 +952,37 @@
             setTimeout(() => {
                 numberDisplay.textContent = currentNumber;
             }, 400);
+            
+            // Afficher ou cacher le Pokémon
+            if (currentNumber >= 11 && currentNumber <= 16) {
+                const pokemon = pokemonData[currentNumber];
+                pokemonName.textContent = pokemon.name;
+                
+                // Créer le Pokémon en SVG basé sur le style des images fournies
+                const svgPokemon = createPokemonSVG(currentNumber);
+                pokemonImage.src = 'data:image/svg+xml;base64,' + btoa(svgPokemon);
+                pokemonSection.style.display = 'block';
+                
+                // Animation d'apparition
+                pokemonSection.classList.remove('slideIn');
+                void pokemonSection.offsetWidth;
+                pokemonSection.classList.add('slideIn');
+                
+                // Ajouter des effets spéciaux pour les Pokémon
+                createFloatingEmojis(['🌟', '✨', '💫', '⭐'], 10);
+                
+                // Annoncer l'arrivée du Pokémon
+                setTimeout(() => {
+                    const arrivalUtterance = new SpeechSynthesisUtterance(`Voici ${pokemon.name} !`);
+                    arrivalUtterance.lang = 'fr-FR';
+                    arrivalUtterance.rate = 0.9;
+                    arrivalUtterance.pitch = 1.2;
+                    arrivalUtterance.volume = 0.8;
+                    speechSynthesis.speak(arrivalUtterance);
+                }, 500);
+            } else {
+                pokemonSection.style.display = 'none';
+            }
             
             // Activer le bouton d'écoute
             listenBtn.disabled = false;
@@ -513,12 +1012,37 @@
             const originalText = listenBtn.innerHTML;
             listenBtn.innerHTML = '<span class="btn-icon">🎵</span>En cours...';
             
-            utterance.onend = () => {
-                listenBtn.style.transform = '';
-                listenBtn.innerHTML = originalText;
-                celebrateSuccess();
-                createFloatingEmojis(['🎉', '🎊', '🏆', '💯'], 8);
-            };
+            // Si c'est un Pokémon, le faire "parler"
+            if (currentNumber >= 11 && currentNumber <= 16 && pokemonSection.style.display !== 'none') {
+                pokemonImage.style.animation = 'speak 0.5s ease-in-out infinite';
+                
+                // Dire aussi le nom du Pokémon après le nombre
+                utterance.onend = () => {
+                    setTimeout(() => {
+                        const pokemonUtterance = new SpeechSynthesisUtterance(`C'est ${pokemonData[currentNumber].name} !`);
+                        pokemonUtterance.lang = 'fr-FR';
+                        pokemonUtterance.rate = 0.8;
+                        pokemonUtterance.pitch = 1.3;
+                        
+                        pokemonUtterance.onend = () => {
+                            listenBtn.style.transform = '';
+                            listenBtn.innerHTML = originalText;
+                            pokemonImage.style.animation = 'float 3s ease-in-out infinite';
+                            celebrateSuccess();
+                            createFloatingEmojis(['🎉', '🎊', '🏆', '💯'], 8);
+                        };
+                        
+                        speechSynthesis.speak(pokemonUtterance);
+                    }, 300);
+                };
+            } else {
+                utterance.onend = () => {
+                    listenBtn.style.transform = '';
+                    listenBtn.innerHTML = originalText;
+                    celebrateSuccess();
+                    createFloatingEmojis(['🎉', '🎊', '🏆', '💯'], 8);
+                };
+            }
             
             speechSynthesis.speak(utterance);
         }
@@ -629,5 +1153,34 @@
             lastTouchEnd = now;
         }, false);
     </script>
+    
+    <!--
+    ====== INSTRUCTIONS POUR INTÉGRER VOS IMAGES POKÉMON ======
+    
+    MÉTHODE 1 - Images en Base64 (Recommandé) :
+    1. Allez sur https://www.base64-image.de/
+    2. Uploadez chaque image Pokémon une par une
+    3. Copiez le code base64 généré
+    4. Dans pokemonData, remplacez les placeholders par vos données :
+       
+       11: {
+           name: "Onzo",
+           image: "data:image/png;base64,[COLLEZ_ICI_LE_CODE_BASE64]"
+       },
+       
+    5. Dans generateNumber(), changez ces lignes :
+       const svgPokemon = createPokemonSVG(currentNumber);
+       pokemonImage.src = 'data:image/svg+xml;base64,' + btoa(svgPokemon);
+       
+       Par simplement :
+       pokemonImage.src = pokemonData[currentNumber].image;
+    
+    MÉTHODE 2 - Images hébergées :
+    1. Hébergez vos images sur un serveur
+    2. Remplacez dans pokemonData :
+       image: "https://votre-site.com/images/onzo.png"
+    
+    Les SVG actuels reproduisent fidèlement le style de vos Pokémon !
+    -->
 </body>
 </html>
